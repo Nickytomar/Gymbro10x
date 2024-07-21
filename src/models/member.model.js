@@ -8,7 +8,7 @@ const memberSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female"],
+      enum: ["Male", "Female"],
       required: true,
     },
     dateOfBirth: Date,
