@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { MemberShip } from "../models/memberShip.model.js";
+import { Member } from "../models/member.model.js";
 
 const createMemberShip = asyncHandler(async (req, res, next) => {
   const {
@@ -79,4 +80,66 @@ const getMemberShipById = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Membership found", membership));
 });
 
-export { createMemberShip, getListOfMemberships, getMemberShipById };
+const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const member = await Member.findById(id);
+
+  if (!member) {
+    return next(new ApiError(404, "Member not found"));
+  }
+
+  const memberships = await MemberShip.aggregate([
+    {
+      $match: {
+        member: member._id,
+      },
+    },
+    {
+      $lookup: {
+        from: "members",
+        localField: "member",
+        foreignField: "_id",
+        as: "memberDetails",
+      },
+    },
+    {
+      $unwind: "$memberDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        member: 1,
+        name: 1,
+        contact: 1,
+        memberShip: 1,
+        startDate: 1,
+        endDate: 1,
+        payment: 1,
+        txnDate: 1,
+        paymentMode: 1,
+        remark: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+      },
+    },
+  ]);
+
+  if (memberships.length === 0) {
+    return next(new ApiError(404, "Membership not found"));
+  }
+
+  const result = {
+    member,
+    memberships,
+  };
+  res.status(200).json(new ApiResponse(200, "Membership found", result));
+});
+
+export {
+  createMemberShip,
+  getMemberdetailsbyId,
+  getListOfMemberships,
+  getMemberShipById,
+};
