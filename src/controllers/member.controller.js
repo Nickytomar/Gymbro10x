@@ -59,4 +59,20 @@ const createMember = asyncHandler(async (req, res, next) => {
   res.status(201).json(new ApiResponse(201, "Member created", member));
 });
 
-export { createMember };
+const getListOfMembers = asyncHandler(async (req, res, next) => {
+  const members = await Member.find({}).sort({ createdAt: -1 });
+
+  res.status(200).json(new ApiResponse(200, "List of members", members));
+});
+
+const getMemberById = asyncHandler(async (req, res, next) => {
+  const member = await Member.findById(req.params.id);
+
+  if (!member) {
+    return next(new ApiError(404, "Member not found"));
+  }
+
+  res.status(200).json(new ApiResponse(200, "Member", member));
+});
+
+export { createMember, getListOfMembers, getMemberById };
