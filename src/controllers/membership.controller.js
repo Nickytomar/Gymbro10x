@@ -137,9 +137,83 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Membership found", result));
 });
 
+const deleteMemberShip = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const membership = await MemberShip.findByIdAndDelete(id);
+
+  if (!membership) {
+    return next(new ApiError(404, "Membership not found"));
+  }
+
+  res.status(200).json(new ApiResponse(200, "Membership deleted", membership));
+});
+
+const updateMemberShip = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const {
+    memberId,
+    name,
+    contact,
+    memberShip,
+    startDate,
+    endDate,
+    payment,
+    txnDate,
+    paymentMode,
+    remark,
+  } = req.body;
+
+  const requiredFields = [
+    { name: "memberId", value: memberId },
+    { name: "name", value: name },
+    { name: "contact", value: contact },
+    { name: "memberShip", value: memberShip },
+    { name: "startDate", value: startDate },
+    { name: "endDate", value: endDate },
+    { name: "payment", value: payment },
+    { name: "txnDate", value: txnDate },
+    { name: "paymentMode", value: paymentMode },
+  ];
+
+  const missingField = requiredFields.find(
+    (field) => field.value === undefined || field.value.trim() === ""
+  );
+
+  if (missingField) {
+    return next(new ApiError(400, `${missingField.name} is required`));
+  }
+
+  const membership = await MemberShip.findByIdAndUpdate(
+    id,
+    {
+      member: memberId,
+      name,
+      contact,
+      memberShip,
+      startDate,
+      endDate,
+      payment,
+      txnDate,
+      paymentMode,
+      remark,
+    },
+    { new: true }
+  );
+
+  if (!membership) {
+    return next(new ApiError(500, "Failed to update membership"));
+  }
+
+  res.status(200).json(new ApiResponse(200, "Membership updated", membership));
+});
+
 export {
   createMemberShip,
   getMemberdetailsbyId,
   getListOfMemberships,
   getMemberShipById,
+  deleteMemberShip,
+  updateMemberShip,
 };
