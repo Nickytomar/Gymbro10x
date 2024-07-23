@@ -76,10 +76,7 @@ const getMemberById = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Member", member));
 });
 
-// getlist of members which have not membership
 const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
-  // use aggreate to get the list of members who have not membership
-
   const members = await Member.aggregate([
     {
       $lookup: {
