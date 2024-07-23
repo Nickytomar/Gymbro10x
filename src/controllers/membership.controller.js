@@ -37,12 +37,17 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
   if (missingField) {
     return next(new ApiError(400, `${missingField.name} is required`));
   }
-
+  let newflag = false;
+  const endDateObject = new Date(endDate.split("-").reverse().join("-"));
+  if (Date.now() < endDateObject.getTime()) {
+    newflag = true;
+  }
   const newMembership = await MemberShip.create({
     member: memberId,
     name,
     contact,
     memberShip,
+    flag: newflag,
     startDate,
     endDate,
     payment,
@@ -63,6 +68,23 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
 const getListOfMemberships = asyncHandler(async (req, res, next) => {
   const memberships = await MemberShip.find({});
 
+  if (memberships.length === 0) {
+    res.status(200).json(new ApiResponse(200, "List is empty", []));
+  }
+
+  memberships.forEach((membership) => {
+    const endDateObject = new Date(
+      membership.endDate.split("-").reverse().join("-")
+    );
+    if (Date.now() < endDateObject.getTime()) {
+      membership.flag = true;
+    }
+  });
+
+  memberships.forEach((membership) => {
+    membership.save();
+  });
+
   res
     .status(200)
     .json(new ApiResponse(200, "List of memberships", memberships));
@@ -74,7 +96,9 @@ const getMemberShipById = asyncHandler(async (req, res, next) => {
   const membership = await MemberShip.findById(id);
 
   if (!membership) {
-    return next(new ApiError(404, "Membership not found"));
+    res
+      .status(200)
+      .json(new ApiResponse(200, "There is no membership for this user", []));
   }
 
   res.status(200).json(new ApiResponse(200, "Membership found", membership));
@@ -209,6 +233,18 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Membership updated", membership));
 });
 
+const getListOfInactiveMemberShip = asyncHandler(async (req, res, next) => {
+  const memberships = await MemberShip.find({ flag: false });
+
+  if (memberships.length === 0) {
+    res.status(200).json(new ApiResponse(200, "List is empty", []));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, "List of memberships", memberships));
+});
+
 export {
   createMemberShip,
   getMemberdetailsbyId,
@@ -216,4 +252,5 @@ export {
   getMemberShipById,
   deleteMemberShip,
   updateMemberShip,
+  getListOfInactiveMemberShip,
 };
