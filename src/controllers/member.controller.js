@@ -3,7 +3,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Member } from "../models/member.model.js";
-import { MemberShip } from "../models/memberShip.model.js";
 
 import fs from "fs";
 import { fileURLToPath } from "url";
