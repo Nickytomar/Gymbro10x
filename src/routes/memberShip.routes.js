@@ -8,6 +8,7 @@ import {
   getMemberdetailsbyId,
   deleteMemberShip,
   updateMemberShip,
+  getListOfInactiveMemberShip,
 } from "../controllers/membership.controller.js";
 
 const router = Router();
@@ -16,8 +17,9 @@ router.use(verifyClient);
 router.route("/create").post(upload.none(), createMemberShip);
 router.route("/").get(getListOfMemberships);
 router.route("/member/:id").get(getMemberdetailsbyId);
-router.route("/:id").get(getMemberShipById);
+router.route("/inactive").get(getListOfInactiveMemberShip);
 router.route("/delete/:id").delete(deleteMemberShip);
 router.route("/update/:id").put(upload.none(), updateMemberShip);
+router.route("/:id").get(getMemberShipById);
 
 export default router;
