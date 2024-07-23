@@ -15,6 +15,10 @@ const memberShipSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    flag: {
+      type: Boolean,
+      default: false,
+    },
     memberShip: {
       type: String,
       required: true,
