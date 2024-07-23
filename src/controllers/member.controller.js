@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Member } from "../models/member.model.js";
+import { MemberShip } from "../models/memberShip.model.js";
 
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -75,4 +76,34 @@ const getMemberById = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Member", member));
 });
 
-export { createMember, getListOfMembers, getMemberById };
+// getlist of members which have not membership
+const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
+  // use aggreate to get the list of members who have not membership
+
+  const members = await Member.aggregate([
+    {
+      $lookup: {
+        from: "memberships",
+        localField: "_id",
+        foreignField: "member",
+        as: "membership",
+      },
+    },
+    {
+      $match: {
+        membership: { $size: 0 },
+      },
+    },
+  ]);
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, "List of inactive members", members));
+});
+
+export {
+  createMember,
+  getListOfMembers,
+  getMemberById,
+  getListOfInactiveMembers,
+};
