@@ -37,6 +37,12 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
   if (missingField) {
     return next(new ApiError(400, `${missingField.name} is required`));
   }
+
+  const member = await Member.findById(memberId);
+  if (!member) {
+    return next(new ApiError(404, "Member not found"));
+  }
+
   let newstatus = false;
   const endDateObject = new Date(endDate.split("-").reverse().join("-"));
   if (Date.now() < endDateObject.getTime()) {
@@ -59,6 +65,10 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
   if (!newMembership) {
     return next(new ApiError(500, "Failed to create memberShip"));
   }
+
+  member.isMemberShipEmpty = false;
+  member.overdue = false;
+  member.save();
 
   res
     .status(201)
