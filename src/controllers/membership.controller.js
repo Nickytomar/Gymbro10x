@@ -150,11 +150,14 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
     },
   ]);
 
+  let result;
   if (memberships.length === 0) {
-    res.status(200).json(new ApiResponse(200, member, "Membership is empty"));
+    result = {
+      member: member,
+      memberships: [],
+    };
   }
-
-  const result = {
+  result = {
     member,
     memberships,
   };
