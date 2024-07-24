@@ -21,7 +21,7 @@ const memberSchema = new mongoose.Schema(
       required: true,
     },
     idImage: String,
-    isMemberShipEmpty: {
+    isMemberShipListEmpty: {
       type: Boolean,
       default: true,
     },

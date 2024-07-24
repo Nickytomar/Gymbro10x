@@ -66,8 +66,8 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
     return next(new ApiError(500, "Failed to create memberShip"));
   }
 
-  member.isMemberShipEmpty = false;
-  member.overdue = false;
+  member.isMemberShipListEmpty = false;
+  member.overdue = !newstatus;
   member.save();
 
   res
