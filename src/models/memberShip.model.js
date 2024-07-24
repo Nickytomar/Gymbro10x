@@ -7,7 +7,7 @@ const memberShipSchema = new mongoose.Schema(
       ref: "Member",
       required: true,
     },
-    status: {
+    isMemberShipExpiry: {
       type: Boolean,
       required: true,
       default: true,
