@@ -56,13 +56,13 @@ const createMember = asyncHandler(async (req, res, next) => {
     return next(new ApiError(500, "Failed to create member"));
   }
 
-  res.status(201).json(new ApiResponse(201, "Member created", member));
+  res.status(201).json(new ApiResponse(201, member, "Member created"));
 });
 
 const getListOfMembers = asyncHandler(async (req, res, next) => {
   const members = await Member.find({}).sort({ createdAt: -1 });
 
-  res.status(200).json(new ApiResponse(200, "List of members", members));
+  res.status(200).json(new ApiResponse(200, members, "List of members"));
 });
 
 const getMemberById = asyncHandler(async (req, res, next) => {
@@ -72,7 +72,7 @@ const getMemberById = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "Member not found"));
   }
 
-  res.status(200).json(new ApiResponse(200, "Member", member));
+  res.status(200).json(new ApiResponse(200, member, "Member"));
 });
 
 const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
@@ -94,7 +94,7 @@ const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, "List of inactive members", members));
+    .json(new ApiResponse(200, members, "List of inactive members"));
 });
 
 export {
