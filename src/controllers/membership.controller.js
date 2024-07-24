@@ -62,7 +62,7 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
 
   res
     .status(201)
-    .json(new ApiResponse(201, "MemberShip created", newMembership));
+    .json(new ApiResponse(201, newMembership, "MemberShip created"));
 });
 
 const getListOfMemberships = asyncHandler(async (req, res, next) => {
@@ -87,7 +87,7 @@ const getListOfMemberships = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, "List of memberships", memberships));
+    .json(new ApiResponse(200, memberships, "List of memberships"));
 });
 
 const getMemberShipById = asyncHandler(async (req, res, next) => {
@@ -101,7 +101,7 @@ const getMemberShipById = asyncHandler(async (req, res, next) => {
       .json(new ApiResponse(200, "There is no membership for this user", []));
   }
 
-  res.status(200).json(new ApiResponse(200, "Membership found", membership));
+  res.status(200).json(new ApiResponse(200, membership, "Membership found"));
 });
 
 const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
@@ -158,7 +158,7 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
     member,
     memberships,
   };
-  res.status(200).json(new ApiResponse(200, "Membership found", result));
+  res.status(200).json(new ApiResponse(200, result, "Membership found"));
 });
 
 const deleteMemberShip = asyncHandler(async (req, res, next) => {
@@ -170,7 +170,7 @@ const deleteMemberShip = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "Membership not found"));
   }
 
-  res.status(200).json(new ApiResponse(200, "Membership deleted", membership));
+  res.status(200).json(new ApiResponse(200, membership, "Membership deleted"));
 });
 
 const updateMemberShip = asyncHandler(async (req, res, next) => {
@@ -230,7 +230,7 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
     return next(new ApiError(500, "Failed to update membership"));
   }
 
-  res.status(200).json(new ApiResponse(200, "Membership updated", membership));
+  res.status(200).json(new ApiResponse(200, membership, "Membership updated"));
 });
 
 const getListOfInactiveMemberShip = asyncHandler(async (req, res, next) => {
@@ -242,7 +242,7 @@ const getListOfInactiveMemberShip = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, "List of memberships", memberships));
+    .json(new ApiResponse(200, memberships, "List of memberships"));
 });
 
 export {
