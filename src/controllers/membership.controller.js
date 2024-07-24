@@ -43,15 +43,15 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "Member not found"));
   }
 
-  let newstatus = false;
+  let newisMemberShipExpiry = true;
   const endDateObject = new Date(endDate.split("-").reverse().join("-"));
   if (Date.now() < endDateObject.getTime()) {
-    newstatus = true;
+    newisMemberShipExpiry = false;
   }
   const newMembership = await MemberShip.create({
     member: memberId,
     memberShip,
-    status: newstatus,
+    isMemberShipExpiry: newisMemberShipExpiry,
     startDate,
     endDate,
     actualAmount,
@@ -67,7 +67,7 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
   }
 
   member.isMemberShipListEmpty = false;
-  member.overdue = !newstatus;
+  member.overdue = newisMemberShipExpiry;
   member.save();
 
   res
@@ -145,7 +145,7 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
         _id: 1,
         member: 1,
         memberShip: 1,
-        status: 1,
+        isMemberShipExpiry: 1,
         startDate: 1,
         endDate: 1,
         actualAmount: 1,
@@ -160,6 +160,16 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
       },
     },
   ]);
+
+  memberships.forEach((membership) => {
+    if (membership.isMemberShipExpiry) {
+      member.overdue = true;
+    } else {
+      member.overdue = false;
+    }
+  });
+
+  member.save();
 
   let result;
   if (memberships.length === 0) {
