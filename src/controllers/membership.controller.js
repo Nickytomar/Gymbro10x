@@ -135,6 +135,7 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
         _id: 1,
         member: 1,
         memberShip: 1,
+        status: 1,
         startDate: 1,
         endDate: 1,
         actualAmount: 1,
