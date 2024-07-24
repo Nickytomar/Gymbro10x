@@ -21,6 +21,14 @@ const memberSchema = new mongoose.Schema(
       required: true,
     },
     idImage: String,
+    isMemberShipEmpty: {
+      type: Boolean,
+      default: true,
+    },
+    overdue: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
