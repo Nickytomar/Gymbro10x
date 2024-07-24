@@ -7,12 +7,12 @@ import { Member } from "../models/member.model.js";
 const createMemberShip = asyncHandler(async (req, res, next) => {
   const {
     memberId,
-    name,
-    contact,
     memberShip,
     startDate,
     endDate,
-    payment,
+    actualAmount,
+    discount,
+    paidAmount,
     txnDate,
     paymentMode,
     remark,
@@ -20,12 +20,12 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
 
   const requiredFields = [
     { name: "memberId", value: memberId },
-    { name: "name", value: name },
-    { name: "contact", value: contact },
     { name: "memberShip", value: memberShip },
     { name: "startDate", value: startDate },
     { name: "endDate", value: endDate },
-    { name: "payment", value: payment },
+    { name: "actualAmount", value: actualAmount },
+    { name: "discount", value: discount },
+    { name: "paidAmount", value: paidAmount },
     { name: "txnDate", value: txnDate },
     { name: "paymentMode", value: paymentMode },
   ];
@@ -37,20 +37,20 @@ const createMemberShip = asyncHandler(async (req, res, next) => {
   if (missingField) {
     return next(new ApiError(400, `${missingField.name} is required`));
   }
-  let newflag = false;
+  let newstatus = false;
   const endDateObject = new Date(endDate.split("-").reverse().join("-"));
   if (Date.now() < endDateObject.getTime()) {
-    newflag = true;
+    newstatus = true;
   }
   const newMembership = await MemberShip.create({
     member: memberId,
-    name,
-    contact,
     memberShip,
-    flag: newflag,
+    status: newstatus,
     startDate,
     endDate,
-    payment,
+    actualAmount,
+    discount,
+    paidAmount,
     txnDate,
     paymentMode,
     remark,
@@ -77,7 +77,7 @@ const getListOfMemberships = asyncHandler(async (req, res, next) => {
       membership.endDate.split("-").reverse().join("-")
     );
     if (Date.now() < endDateObject.getTime()) {
-      membership.flag = true;
+      membership.status = true;
     }
   });
 
@@ -134,12 +134,12 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
       $project: {
         _id: 1,
         member: 1,
-        name: 1,
-        contact: 1,
         memberShip: 1,
         startDate: 1,
         endDate: 1,
-        payment: 1,
+        actualAmount: 1,
+        discount: 1,
+        paidAmount: 1,
         txnDate: 1,
         paymentMode: 1,
         remark: 1,
@@ -181,12 +181,12 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
 
   const {
     memberId,
-    name,
-    contact,
     memberShip,
     startDate,
     endDate,
-    payment,
+    actualAmount,
+    discount,
+    paidAmount,
     txnDate,
     paymentMode,
     remark,
@@ -194,12 +194,12 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
 
   const requiredFields = [
     { name: "memberId", value: memberId },
-    { name: "name", value: name },
-    { name: "contact", value: contact },
     { name: "memberShip", value: memberShip },
     { name: "startDate", value: startDate },
     { name: "endDate", value: endDate },
-    { name: "payment", value: payment },
+    { name: "actualAmount", value: actualAmount },
+    { name: "discount", value: discount },
+    { name: "paidAmount", value: paidAmount },
     { name: "txnDate", value: txnDate },
     { name: "paymentMode", value: paymentMode },
   ];
@@ -216,12 +216,12 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
     id,
     {
       member: memberId,
-      name,
-      contact,
       memberShip,
       startDate,
       endDate,
-      payment,
+      actualAmount,
+      discount,
+      paidAmount,
       txnDate,
       paymentMode,
       remark,
@@ -237,7 +237,7 @@ const updateMemberShip = asyncHandler(async (req, res, next) => {
 });
 
 const getListOfInactiveMemberShip = asyncHandler(async (req, res, next) => {
-  const memberships = await MemberShip.find({ flag: false });
+  const memberships = await MemberShip.find({ status: false });
 
   if (memberships.length === 0) {
     res.status(200).json(new ApiResponse(200, "List is empty", []));
