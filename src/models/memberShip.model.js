@@ -7,15 +7,7 @@ const memberShipSchema = new mongoose.Schema(
       ref: "Member",
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-    },
-    contact: {
-      type: String,
-      required: true,
-    },
-    flag: {
+    status: {
       type: Boolean,
       required: true,
       default: true,
@@ -32,7 +24,15 @@ const memberShipSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    payment: {
+    actualAmount: {
+      type: Number,
+      required: true,
+    },
+    discount: {
+      type: Number,
+      required: true,
+    },
+    paidAmount: {
       type: Number,
       required: true,
     },
