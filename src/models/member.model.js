@@ -11,7 +11,7 @@ const memberSchema = new mongoose.Schema(
       enum: ["Male", "Female"],
       required: true,
     },
-    dateOfBirth: Date,
+    dateOfBirth: String,
     contact: {
       type: String,
       required: true,
