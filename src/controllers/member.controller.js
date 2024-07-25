@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Member } from "../models/member.model.js";
+import { MemberShip } from "../models/membership.model.js";
+import { cloudinary } from "../utils/cloudinary.js";
 
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -97,9 +99,28 @@ const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, members, "List of inactive members"));
 });
 
+const deleteMemberById = asyncHandler(async (req, res, next) => {
+  const member = await Member.findByIdAndDelete(req.params.id);
+  if (!member) {
+    return next(new ApiError(404, "member not found"));
+  }
+
+  const publicId = member.idImage.split("/").pop().split(".")[0];
+  await cloudinary.uploader.destroy(publicId);
+
+  const memberships = await MemberShip.find({ member: req.params.id });
+
+  if (memberships.length > 0) {
+    await MemberShip.deleteMany({ member: req.params.id });
+  }
+
+  res.status(200).json(new ApiResponse(200, member, "Member deleted"));
+});
+
 export {
   createMember,
   getListOfMembers,
   getMemberById,
   getListOfInactiveMembers,
+  deleteMemberById,
 };
