@@ -37,18 +37,10 @@ const createMember = asyncHandler(async (req, res, next) => {
 
   const Image = await uploadOnCloudinary(tempFilePath);
 
-  const [day, month, year] = DOB.split("-");
-  const dateOfBirth = new Date(`${month}-${day}-${year}`);
-
-  // Check if the dateOfBirth is valid
-  if (isNaN(dateOfBirth.getTime())) {
-    throw new ApiError(400, "Invalid date of birth");
-  }
-
   const member = await Member.create({
     name,
     gender,
-    dateOfBirth: dateOfBirth,
+    dateOfBirth: DOB,
     contact,
     Address,
     idImage: Image.url,
