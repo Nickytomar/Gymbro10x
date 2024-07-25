@@ -169,7 +169,6 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
       .status(200)
       .json(new ApiResponse(200, result, "Membership found"));
   }
-  console.log("hello");
 
   for (const membership of memberships) {
     if (!membership.isMemberShipExpiry) {
