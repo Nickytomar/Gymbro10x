@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { MemberShip } from "../models/memberShip.model.js";
+import { MemberShip } from "../models/membership.model.js";
 import { Member } from "../models/member.model.js";
 
 const createMemberShip = asyncHandler(async (req, res, next) => {
@@ -79,7 +79,7 @@ const getListOfMemberships = asyncHandler(async (req, res, next) => {
   const memberships = await MemberShip.find({});
 
   if (memberships.length === 0) {
-    res.status(200).json(new ApiResponse(200, "List is empty", []));
+    return res.status(200).json(new ApiResponse(200, [], "List is empty"));
   }
 
   memberships.forEach((membership) => {
@@ -87,13 +87,11 @@ const getListOfMemberships = asyncHandler(async (req, res, next) => {
       membership.endDate.split("-").reverse().join("-")
     );
     if (Date.now() < endDateObject.getTime()) {
-      membership.status = true;
+      membership.isMemberShipExpiry = false;
     }
   });
 
-  memberships.forEach((membership) => {
-    membership.save();
-  });
+  await Promise.all(memberships.map((membership) => membership.save()));
 
   res
     .status(200)
