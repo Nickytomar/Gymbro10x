@@ -159,28 +159,32 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
     },
   ]);
 
-  memberships.forEach((membership) => {
-    if (membership.isMemberShipExpiry) {
-      member.overdue = true;
-    } else {
-      member.overdue = false;
-    }
-  });
-
-  member.save();
-
   let result;
   if (memberships.length === 0) {
     result = {
       member: member,
       memberships: [],
     };
+    return res
+      .status(200)
+      .json(new ApiResponse(200, result, "Membership found"));
   }
+  console.log("hello");
+
+  for (const membership of memberships) {
+    if (!membership.isMemberShipExpiry) {
+      member.overdue = false;
+      break;
+    }
+  }
+
+  await member.save();
+
   result = {
     member,
     memberships,
   };
-  res.status(200).json(new ApiResponse(200, result, "Membership found"));
+  return res.status(200).json(new ApiResponse(200, result, "Membership found"));
 });
 
 const deleteMemberShip = asyncHandler(async (req, res, next) => {
