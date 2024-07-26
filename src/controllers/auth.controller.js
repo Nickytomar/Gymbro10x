@@ -125,15 +125,21 @@ const logoutClient = asyncHandler(async (req, res) => {
 });
 
 const getListOfClient = asyncHandler(async (req, res) => {
-  const client = await Client.find({}).sort({ createdAt: -1 });
+  const client = await Client.find({})
+    .sort({ createdAt: -1 })
+    .select("-refreshToken");
 
-  if (client.length() == 0) {
+  if (client.length == 0) {
     return res
       .status(200)
       .json(new ApiResponse(200, [], "clients list is empty"));
   }
 
-  res.status(200).json(new ApiResponse(200, client, "list of clients"));
+  const result = {
+    client,
+    noOfClient: client.length,
+  };
+  res.status(200).json(new ApiResponse(200, result, "list of clients"));
 });
 
 export { registerClient, loginClient, logoutClient, getListOfClient };
