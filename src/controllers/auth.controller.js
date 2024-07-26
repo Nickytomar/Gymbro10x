@@ -124,4 +124,16 @@ const logoutClient = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "client logged out"));
 });
 
-export { registerClient, loginClient, logoutClient };
+const getListOfClient = asyncHandler(async (req, res) => {
+  const client = await Client.find({}).sort({ createdAt: -1 });
+
+  if (client.length() == 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "clients list is empty"));
+  }
+
+  res.status(200).json(new ApiResponse(200, client, "list of clients"));
+});
+
+export { registerClient, loginClient, logoutClient, getListOfClient };
