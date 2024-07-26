@@ -142,4 +142,22 @@ const getListOfClient = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, result, "list of clients"));
 });
 
-export { registerClient, loginClient, logoutClient, getListOfClient };
+const deleteClient = asyncHandler(async (req, res) => {
+  const client = await Client.findByIdAndDelete(req.params.id);
+
+  if (!client) {
+    throw new ApiError(404, "Client not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Client deleted successfully"));
+});
+
+export {
+  registerClient,
+  loginClient,
+  logoutClient,
+  getListOfClient,
+  deleteClient,
+};
