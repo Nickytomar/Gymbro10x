@@ -38,7 +38,7 @@ const dashboard = asyncHandler(async (req, res, next) => {
     totalCollection: totalMontlyAmount,
   });
 
-  res.status(201).json(new ApiResponse(201, newdashboard, "dashboard info"));
+  res.status(200).json(new ApiResponse(200, newdashboard, "dashboard info"));
 });
 
 export { dashboard };
