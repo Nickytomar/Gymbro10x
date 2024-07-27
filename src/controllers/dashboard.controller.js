@@ -1,4 +1,3 @@
-import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { MemberShip } from "../models/memberShip.model.js";
@@ -19,24 +18,20 @@ const dashboard = asyncHandler(async (req, res, next) => {
     const startDateObject = new Date(
       memberShip.startDate.split("-").reverse().join("-")
     );
-    const endDateObject = new Date(
-      memberShip.endDate.split("-").reverse().join("-")
-    );
     if (startDateObject > monthly) {
       monthlyAmount += memberShip.paidAmount;
     }
     if (startDateObject > weekly) {
       weeklyAmount += memberShip.paidAmount;
     }
-
     totalMontlyAmount += memberShip.paidAmount;
   });
 
-  const newdashboard = await Dashboard.create({
+  const newdashboard = {
     montlyCollection: monthlyAmount,
     weeklyCollection: weeklyAmount,
     totalCollection: totalMontlyAmount,
-  });
+  };
 
   res.status(200).json(new ApiResponse(200, newdashboard, "dashboard info"));
 });

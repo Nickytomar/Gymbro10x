@@ -124,4 +124,40 @@ const logoutClient = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "client logged out"));
 });
 
-export { registerClient, loginClient, logoutClient };
+const getListOfClient = asyncHandler(async (req, res) => {
+  const client = await Client.find({})
+    .sort({ createdAt: -1 })
+    .select("-refreshToken");
+
+  if (client.length == 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "clients list is empty"));
+  }
+
+  const result = {
+    client,
+    noOfClient: client.length,
+  };
+  res.status(200).json(new ApiResponse(200, result, "list of clients"));
+});
+
+const deleteClient = asyncHandler(async (req, res) => {
+  const client = await Client.findByIdAndDelete(req.params.id);
+
+  if (!client) {
+    throw new ApiError(404, "Client not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Client deleted successfully"));
+});
+
+export {
+  registerClient,
+  loginClient,
+  logoutClient,
+  getListOfClient,
+  deleteClient,
+};
