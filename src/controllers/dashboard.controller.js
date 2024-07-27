@@ -1,7 +1,6 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { MemberShip } from "../models/memberShip.model.js";
-import { Dashboard } from "../models/dashboard.model.js";
 
 const dashboard = asyncHandler(async (req, res, next) => {
   const memberShips = await MemberShip.find({});
