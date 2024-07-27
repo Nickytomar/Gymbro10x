@@ -195,6 +195,54 @@ const deleteMemberShip = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "Membership not found"));
   }
 
+  const member = await Member.findById(membership.member);
+  const memberships = await MemberShip.aggregate([
+    {
+      $match: {
+        member: member._id,
+      },
+    },
+    {
+      $lookup: {
+        from: "members",
+        localField: "member",
+        foreignField: "_id",
+        as: "memberDetails",
+      },
+    },
+    {
+      $unwind: "$memberDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        member: 1,
+        memberShip: 1,
+        isMemberShipExpiry: 1,
+        startDate: 1,
+        endDate: 1,
+        actualAmount: 1,
+        discount: 1,
+        paidAmount: 1,
+        txnDate: 1,
+        paymentMode: 1,
+        remark: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+      },
+    },
+  ]);
+
+  for (const membership of memberships) {
+    if (membership.isMemberShipExpiry) {
+      member.overdue = true;
+      break;
+    }
+  }
+
+  await member.save();
+
   res.status(200).json(new ApiResponse(200, membership, "Membership deleted"));
 });
 
