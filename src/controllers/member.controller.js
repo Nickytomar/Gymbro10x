@@ -38,6 +38,7 @@ const createMember = asyncHandler(async (req, res, next) => {
   const Image = await uploadOnCloudinary(tempFilePath);
 
   const member = await Member.create({
+    clientId: req.client._id,
     name,
     gender,
     dateOfBirth: DOB,
@@ -55,6 +56,14 @@ const createMember = asyncHandler(async (req, res, next) => {
 
 const getListOfMembers = asyncHandler(async (req, res, next) => {
   const members = await Member.find({}).sort({ createdAt: -1 });
+
+  res.status(200).json(new ApiResponse(200, members, "List of members"));
+});
+
+const getListOfMembersbyClientId = asyncHandler(async (req, res, next) => {
+  const members = await Member.find({ clientId: req.client._id }).sort({
+    createdAt: -1,
+  });
 
   res.status(200).json(new ApiResponse(200, members, "List of members"));
 });
@@ -97,6 +106,10 @@ const deleteMemberById = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "member not found"));
   }
 
+  if (member.clientId.toString() !== req.client._id.toString()) {
+    return next(new ApiError(403, "You are not allowed to delete this member"));
+  }
+
   const publicId = member.idImage.split("/").pop().split(".")[0];
   await cloudinary.uploader.destroy(publicId);
 
@@ -115,4 +128,5 @@ export {
   getMemberById,
   getListOfInactiveMembers,
   deleteMemberById,
+  getListOfMembersbyClientId,
 };
