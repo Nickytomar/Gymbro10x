@@ -1,11 +1,7 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-<<<<<<< HEAD
 import { MemberShip } from "../models/memberShip.model.js";
-=======
-import { MemberShip } from "../models/membership.model.js";
 import { Member } from "../models/member.model.js";
->>>>>>> 8cc9d05 (refactor: Update dashboard controller to calculate additional metrics)
 
 const dashboard = asyncHandler(async (req, res, next) => {
   const members = await Member.find({ clientId: req.client._id });
