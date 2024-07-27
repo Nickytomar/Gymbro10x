@@ -16,6 +16,11 @@ const dashboard = asyncHandler(async (req, res, next) => {
   const flattenedMemberShipList = memberShipList.flat();
 
   let currentDate = new Date();
+
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const year = String(currentDate.getFullYear());
+  let currentFormatedDate = `${day}-${month}-${year};`; //'DD-MM-YYYY'
   const monthlyDate = new Date(currentDate);
   monthlyDate.setMonth(currentDate.getMonth() - 1);
   const weeklyDate = new Date(currentDate);
@@ -23,11 +28,10 @@ const dashboard = asyncHandler(async (req, res, next) => {
 
   let monthlyAmount = 0;
   let weeklyAmount = 0;
+  let todayCollectionAmount = 0;
   let totalMontlyAmount = 0;
   let activeMembersCount = 0;
   let inactiveMembersCount = 0;
-  let newMembersCount = 0;
-  let expiredMembershipsCount = 0;
 
   const newMembersDate = new Date(currentDate);
   newMembersDate.setDate(currentDate.getDate() - 30); // Example: new members in the last 30 days
@@ -39,11 +43,6 @@ const dashboard = asyncHandler(async (req, res, next) => {
       activeMembersCount++;
     } else {
       inactiveMembersCount++;
-    }
-
-    const createdAtDate = new Date(member.createdAt);
-    if (createdAtDate > newMembersDate) {
-      newMembersCount++;
     }
   });
 
@@ -63,8 +62,8 @@ const dashboard = asyncHandler(async (req, res, next) => {
     }
     totalMontlyAmount += memberShip.paidAmount;
 
-    if (endDateObject < currentDate) {
-      expiredMembershipsCount++;
+    if (memberShip.startDate == currentFormatedDate) {
+      todayCollectionAmount += memberShip.paidAmount;
     }
   });
 
@@ -72,10 +71,9 @@ const dashboard = asyncHandler(async (req, res, next) => {
     monthlyCollection: monthlyAmount,
     weeklyCollection: weeklyAmount,
     totalCollection: totalMontlyAmount,
+    todayCollectionAmount: todayCollectionAmount,
     activeMembers: activeMembersCount,
     inactiveMembers: inactiveMembersCount,
-    newMembers: newMembersCount,
-    expiredMemberships: expiredMembershipsCount,
   };
 
   res.status(200).json(new ApiResponse(200, newdashboard, "dashboard info"));
