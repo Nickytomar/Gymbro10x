@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { MemberShip } from "../models/membership.model.js";
+import { MemberShip } from "../models/memberShip.model.js";
 import { Member } from "../models/member.model.js";
 
 const createMemberShip = asyncHandler(async (req, res, next) => {

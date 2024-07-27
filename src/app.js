@@ -34,6 +34,9 @@ app.use("/api/v1/client", client);
 app.use("/api/v1/member", member);
 app.use("/api/v1/membership", membership);
 app.use("/api/v1/dashboard", dashboard);
+app.use("/", (req, res) => {
+  res.send("welcome to server");
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
