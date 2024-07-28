@@ -161,6 +161,8 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
 
   let result;
   if (memberships.length === 0) {
+    member.isMemberShipListEmpty = true;
+    await member.save();
     result = {
       member: member,
       memberships: [],
@@ -168,6 +170,8 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
     return res
       .status(200)
       .json(new ApiResponse(200, result, "Membership found"));
+  } else {
+    member.isMemberShipListEmpty = false;
   }
 
   for (const membership of memberships) {
