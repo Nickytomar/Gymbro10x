@@ -2,6 +2,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Client } from "../models/client.model.js";
+import { Member } from "../models/member.model.js";
+import { MemberShip } from "../models/memberShip.model.js";
+import { isValidObjectId } from "mongoose";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Options for setting cookies
 const cookieOptions = {
@@ -143,9 +146,22 @@ const getListOfClient = asyncHandler(async (req, res) => {
 });
 
 const deleteClient = asyncHandler(async (req, res) => {
-  const client = await Client.findByIdAndDelete(req.params.id);
+  if (!isValidObjectId(req.params.id)) {
+    throw new ApiError(400, "Client id is required");
+  }
+  const client = await Client.findById(req.params.id);
+  if (!client) {
+    throw new ApiError(404, "Client not found");
+  }
+  const members = await Member.find({ clientId: req.params.id });
+  members.forEach(async (member) => {
+    await MemberShip.deleteMany({ member: member._id });
+    await Member.findByIdAndDelete(member._id);
+  });
+  await Client.findByIdAndDelete(req.params.id);
 
   if (!client) {
+    s;
     throw new ApiError(404, "Client not found");
   }
 
