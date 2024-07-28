@@ -157,6 +157,11 @@ const getMemberdetailsbyId = asyncHandler(async (req, res, next) => {
         __v: 1,
       },
     },
+    {
+      $sort: {
+        isMemberShipExpiry: 1,
+      },
+    },
   ]);
 
   let result;
