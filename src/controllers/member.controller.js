@@ -55,14 +55,14 @@ const createMember = asyncHandler(async (req, res, next) => {
 });
 
 const getListOfMembers = asyncHandler(async (req, res, next) => {
-  const members = await Member.find({}).sort({ createdAt: -1 });
+  const members = await Member.find({}).sort({ name: 1 });
 
   res.status(200).json(new ApiResponse(200, members, "List of members"));
 });
 
 const getListOfMembersbyClientId = asyncHandler(async (req, res, next) => {
   const members = await Member.find({ clientId: req.client._id }).sort({
-    createdAt: -1,
+    name: 1,
   });
 
   res.status(200).json(new ApiResponse(200, members, "List of members"));

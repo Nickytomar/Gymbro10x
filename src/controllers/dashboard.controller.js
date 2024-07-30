@@ -39,7 +39,7 @@ const dashboard = asyncHandler(async (req, res, next) => {
   upcomingExpirationDate.setDate(currentDate.getDate() + 30); // Example: memberships expiring in the next 30 days
 
   members.forEach((member) => {
-    if (!member.overdue) {
+    if (!member.overdue && !member.isMemberShipListEmpty) {
       activeMembersCount++;
     } else {
       inactiveMembersCount++;
