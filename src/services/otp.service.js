@@ -1,9 +1,9 @@
-import twilio from "twilio";
+// import twilio from "twilio";
 import { ApiError } from "../utils/ApiError.js";
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const verifySid = process.env.TWILIO_VERIFY_SID;
-const client = new twilio(accountSid, authToken);
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const authToken = process.env.TWILIO_AUTH_TOKEN;
+// const verifySid = process.env.TWILIO_VERIFY_SID;
+// const client = new twilio(accountSid, authToken);
 
 let OTP, user;
 
@@ -16,30 +16,30 @@ const generateOtp = () => {
   return OTP;
 };
 
-async function sendOtp(number) {
-  const otp = generateOtp();
+// async function sendOtp(number) {
+//   const otp = generateOtp();
 
-  // my acc
-  // const message = await client.messages.create({
-  //   body: `Your otp verification for user is ${OTP}`,
-  //   messagingServiceSid: "MG3403a69ee58539d33b66f4093c8ea857",
-  //   to: number,
-  //   from: "+16502499145",
-  // });
+//   // my acc
+//   // const message = await client.messages.create({
+//   //   body: `Your otp verification for user is ${OTP}`,
+//   //   messagingServiceSid: "MG3403a69ee58539d33b66f4093c8ea857",
+//   //   to: number,
+//   //   from: "+16502499145",
+//   // });
 
-  // client acc
-  const message = await client.messages.create({
-    body: `Your otp verification for user is ${OTP}`,
-    // messagingServiceSid: verifySid,
-    to: number,
-    from: "+12182491243",
-  });
+//   // client acc
+//   const message = await client.messages.create({
+//     body: `Your otp verification for user is ${OTP}`,
+//     // messagingServiceSid: verifySid,
+//     to: number,
+//     from: "+12182491243",
+//   });
 
-  if (!message) {
-    throw new ApiError(500, `error while sending otp ${message}`);
-  }
-  return message;
-}
+//   if (!message) {
+//     throw new ApiError(500, `error while sending otp ${message}`);
+//   }
+//   return message;
+// }
 
 function verifyOtp(otp) {
   if (otp != OTP) {
@@ -154,4 +154,4 @@ function verifyOtp(otp) {
 //   return res.status(200).json(new ApiResponse(200, { otp }, "you are login"));
 // });
 
-export { sendOtp, verifyOtp, generateOtp };
+export { verifyOtp, generateOtp };
