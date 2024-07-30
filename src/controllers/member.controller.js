@@ -13,7 +13,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const createMember = asyncHandler(async (req, res, next) => {
-  const { name, gender, DOB, contact, Address, idImage } = req.body;
+  const { name, gender, DOB, contact, Address, idImage, documentImage } =
+    req.body;
 
   const requiredFields = [
     { name: "name", value: name },
@@ -34,8 +35,12 @@ const createMember = asyncHandler(async (req, res, next) => {
   const buffer = Buffer.from(idImage, "base64");
   const tempFilePath = path.join(__dirname, "temp_image.jpg");
   fs.writeFileSync(tempFilePath, buffer);
+  const buffer1 = Buffer.from(documentImage, "base64");
+  const tempFilePath1 = path.join(__dirname, "temp_doc.jpg");
+  fs.writeFileSync(tempFilePath1, buffer1);
 
   const Image = await uploadOnCloudinary(tempFilePath);
+  const doc = await uploadOnCloudinary(tempFilePath1);
 
   const member = await Member.create({
     clientId: req.client._id,
@@ -44,7 +49,8 @@ const createMember = asyncHandler(async (req, res, next) => {
     dateOfBirth: DOB,
     contact,
     Address,
-    idImage: Image.url,
+    idImage: Image && Image.url ? Image.url : "",
+    documentImage: doc && doc.url ? doc.url : "",
   });
 
   if (!member) {
@@ -55,21 +61,25 @@ const createMember = asyncHandler(async (req, res, next) => {
 });
 
 const getListOfMembers = asyncHandler(async (req, res, next) => {
-  const members = await Member.find({}).sort({ createdAt: -1 });
+  const members = await Member.find({})
+    .sort({ createdAt: -1 })
+    .select("-documentImage");
 
   res.status(200).json(new ApiResponse(200, members, "List of members"));
 });
 
 const getListOfMembersbyClientId = asyncHandler(async (req, res, next) => {
-  const members = await Member.find({ clientId: req.client._id }).sort({
-    createdAt: -1,
-  });
+  const members = await Member.find({ clientId: req.client._id })
+    .sort({
+      createdAt: -1,
+    })
+    .select("-documentImage");
 
   res.status(200).json(new ApiResponse(200, members, "List of members"));
 });
 
 const getMemberById = asyncHandler(async (req, res, next) => {
-  const member = await Member.findById(req.params.id);
+  const member = await Member.findById(req.params.id).select("-documentImage");
 
   if (!member) {
     return next(new ApiError(404, "Member not found"));
@@ -93,7 +103,7 @@ const getListOfInactiveMembers = asyncHandler(async (req, res, next) => {
         membership: { $size: 0 },
       },
     },
-  ]);
+  ]).select("-documentImage");
 
   res
     .status(200)
