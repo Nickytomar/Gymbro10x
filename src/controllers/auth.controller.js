@@ -4,7 +4,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Client } from "../models/client.model.js";
 import { Member } from "../models/member.model.js";
 import { MemberShip } from "../models/memberShip.model.js";
+import { sendEmail } from "../services/mail.service.js";
 import { isValidObjectId } from "mongoose";
+import { generateOtp, verifyOtp } from "../services/otp.service.js";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Options for setting cookies
 const cookieOptions = {
@@ -170,10 +172,83 @@ const deleteClient = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Client deleted successfully"));
 });
 
+const sendOtptoMail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  console.log("email", email);
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+  const otp = generateOtp();
+
+  if (!otp) {
+    throw new ApiError(500, "error while sending otp");
+  }
+
+  const data = {
+    otp,
+    validity: "10 minutes",
+    companyName: "Gymbro10x",
+  };
+
+  const mail = await sendEmail(
+    email,
+    "OTP for Email Verification",
+    "otp_email_template",
+    data
+  );
+
+  if (!mail) {
+    throw new ApiError(500, "error while sending otp");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, mail, ` ${otp} otp sent successfully`));
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { email, otp, password, comfirmPassword } = req.body;
+
+  if (!email || !otp || !password || !comfirmPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  if (!emailRegex.test(email)) {
+    throw new ApiError(400, "Invalid email format");
+  }
+
+  if (!verifyOtp(otp)) {
+    throw new ApiError(400, "Invalid OTP");
+  }
+
+  if (password !== comfirmPassword) {
+    throw new ApiError(400, "Password and confirm password does not match");
+  }
+
+  let client = await Client.findOne({ email });
+
+  if (!client) {
+    throw new ApiError(400, "Invalid email");
+  }
+
+  client.password = password;
+  await client.save();
+
+  client = await Client.findOne({ email }).select(" -refreshToken");
+
+  res.status(200).json({
+    status_code: 200,
+    message: "Password changed successfully",
+    data: client,
+  });
+});
+
 export {
   registerClient,
   loginClient,
   logoutClient,
   getListOfClient,
   deleteClient,
+  sendOtptoMail,
+  changePassword,
 };
