@@ -8,6 +8,8 @@ import {
   registerClient,
   getListOfClient,
   deleteClient,
+  sendOtptoMail,
+  changePassword,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -18,5 +20,7 @@ router.route("/register").post(upload.none(), registerClient);
 router.route("/login").post(loginClient);
 router.route("/logout").post(verifyClient, logoutClient);
 router.route("/delete/:id").delete(deleteClient);
+router.route("/send-otp").post(sendOtptoMail);
+router.route("/change-password").post(changePassword);
 
 export default router;
