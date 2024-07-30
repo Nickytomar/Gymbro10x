@@ -17,6 +17,6 @@ router.route("/").get(getListOfClient);
 router.route("/register").post(upload.none(), registerClient);
 router.route("/login").post(loginClient);
 router.route("/logout").post(verifyClient, logoutClient);
-router.route("/delete/:id").delete(verifyClient, deleteClient);
+router.route("/delete/:id").delete(deleteClient);
 
 export default router;
