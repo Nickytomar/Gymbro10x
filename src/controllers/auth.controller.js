@@ -174,9 +174,14 @@ const deleteClient = asyncHandler(async (req, res) => {
 
 const sendOtptoMail = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  console.log("email", email);
-  if (!email) {
-    throw new ApiError(400, "Email is required");
+
+  if (!email || !emailRegex.test(email)) {
+    throw new ApiError(400, "invalid Email");
+  }
+
+  const client = await Client.findOne({ email });
+  if (!client) {
+    throw new ApiError(404, "Client not found");
   }
   const otp = generateOtp();
 
