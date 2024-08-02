@@ -27,6 +27,7 @@ import client from "./routes/client.routes.js";
 import member from "./routes/member.routes.js";
 import membership from "./routes/memberShip.routes.js";
 import dashboard from "./routes/dashboard.routes.js";
+import membershipDropDown from "./routes/membershipDropDown.routes.js";
 
 //routes declaration
 app.use("/api/v1/healthcheck", healthcheckRouter);
@@ -34,9 +35,7 @@ app.use("/api/v1/client", client);
 app.use("/api/v1/member", member);
 app.use("/api/v1/membership", membership);
 app.use("/api/v1/dashboard", dashboard);
-app.use("/", (req, res) => {
-  res.send("welcome to server");
-});
+app.use("/api/v1/membershipDropDown", membershipDropDown);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
