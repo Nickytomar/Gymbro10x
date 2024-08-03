@@ -242,7 +242,7 @@ const changePassword = asyncHandler(async (req, res) => {
   client = await Client.findOne({ email }).select(" -refreshToken");
 
   res.status(200).json({
-    status_code: 200,
+    statusCode: 200,
     message: "Password changed successfully",
     data: client,
   });

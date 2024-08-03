@@ -41,14 +41,14 @@ app.use("/api/v1/membershipDropDown", membershipDropDown);
 app.use((err, req, res, next) => {
   if (err instanceof ApiError) {
     res.status(err.statusCode).json({
-      status_code: err.statusCode,
+      statusCode: err.statusCode,
       message: err.message,
       title: "Error",
       exception: err.message,
     });
   } else {
     res.status(500).json({
-      status_code: 500,
+      statusCode: 500,
       message: "Internal Server Error",
       title: "Error",
       exception: err.message,
