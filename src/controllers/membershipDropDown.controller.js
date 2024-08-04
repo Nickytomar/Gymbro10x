@@ -4,11 +4,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { membershipDropDown } from "../models/membershipDropDown.model.js";
 
 const createMembershipDropDown = asyncHandler(async (req, res, next) => {
-  const { memberShipName, price } = req.body;
+  const { memberShipName, price, duration } = req.body;
 
   const requiredFields = [
     { name: "memberShipName", value: memberShipName },
     { name: "price", value: price },
+    { name: "duration", value: duration },
   ];
 
   const missingField = requiredFields.find(
@@ -23,6 +24,7 @@ const createMembershipDropDown = asyncHandler(async (req, res, next) => {
     client: req.client._id,
     memberShipName,
     price,
+    duration,
   });
 
   if (!memberShip) {
