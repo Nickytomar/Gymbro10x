@@ -19,7 +19,7 @@ const generatorAccessAndRefreshTokenForClient = async (clientId) => {
   try {
     const client = await Client.findById(clientId);
     if (!client) {
-      throw new Error("Property not found");
+      throw new Error("client not found");
     }
 
     const accessToken = client.generateAccessToken();
