@@ -327,6 +327,20 @@ const getListOfInactiveMemberShip = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, memberships, "List of memberships"));
 });
 
+const getAllmembershipByMemberId = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const memberships = await MemberShip.find({ member: id });
+
+  if (memberships.length === 0) {
+    res.status(200).json(new ApiResponse(200, "List is empty", []));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, memberships, "List of memberships"));
+});
+
 export {
   createMemberShip,
   getMemberdetailsbyId,
@@ -335,4 +349,5 @@ export {
   deleteMemberShip,
   updateMemberShip,
   getListOfInactiveMemberShip,
+  getAllmembershipByMemberId,
 };
