@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 const memberSchema = new mongoose.Schema(
   {
-    clientId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Client",
-      // required: true,
+    // clientId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Client",
+    //   // required: true,
+    // },
+    clientEmail: {
+      type: String,
+      required: true,
     },
     name: {
       type: String,
@@ -35,8 +40,40 @@ const memberSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    flag: {
+      type: Boolean,
+      default: false,
+    },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
+
+memberSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      contact: this.contact,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+
+memberSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
+};
 
 export const Member = mongoose.model("Member", memberSchema);
