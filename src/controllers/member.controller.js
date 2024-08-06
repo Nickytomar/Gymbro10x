@@ -3,20 +3,58 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Member } from "../models/member.model.js";
+import { Client } from "../models/client.model.js";
 import { MemberShip } from "../models/memberShip.model.js";
 import { cloudinary } from "../utils/cloudinary.js";
-
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 import fs from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const cookieOptions = {
+  // making the cookie not modifiable by client only sever can modify it
+  httpOnly: true, // Make cookies accessible only via HTTP(S)
+  secure: true, // Ensure cookies are only sent over HTTPS
+};
+
+const generatorAccessAndRefreshTokenForClient = async (clientId) => {
+  try {
+    const member = await Member.findById(clientId);
+    if (!member) {
+      throw new Error("member not found");
+    }
+
+    const accessToken = member.generateAccessToken();
+    const refreshToken = member.generateRefreshToken();
+
+    member.refreshToken = refreshToken;
+    await member.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "Something went wrong while generating Access and Refresh tokens"
+    );
+  }
+};
+
 const createMember = asyncHandler(async (req, res, next) => {
-  const { name, gender, DOB, contact, Address, idImage, documentImage } =
-    req.body;
+  const {
+    clientEmail,
+    name,
+    gender,
+    DOB,
+    contact,
+    Address,
+    idImage,
+    documentImage,
+  } = req.body;
 
   const requiredFields = [
+    { name: "clientEmail", value: clientEmail },
     { name: "name", value: name },
     { name: "gender", value: gender },
     { name: "DOB", value: DOB },
@@ -31,19 +69,35 @@ const createMember = asyncHandler(async (req, res, next) => {
   if (missingField) {
     return next(new ApiError(400, `${missingField.name} is required`));
   }
+  if (!emailRegex.test(clientEmail)) {
+    return next(new ApiError(400, "Invalid email"));
+  }
 
-  const buffer = Buffer.from(idImage, "base64");
-  const tempFilePath = path.join(__dirname, "temp_image.jpg");
-  fs.writeFileSync(tempFilePath, buffer);
-  const buffer1 = Buffer.from(documentImage, "base64");
-  const tempFilePath1 = path.join(__dirname, "temp_doc.jpg");
-  fs.writeFileSync(tempFilePath1, buffer1);
+  const client = await Client.findOne({ email: clientEmail });
+  if (!client) {
+    return next(
+      new ApiError(404, {}, `client with email : ${clientEmail} not found`)
+    );
+  }
 
-  const Image = await uploadOnCloudinary(tempFilePath);
-  const doc = await uploadOnCloudinary(tempFilePath1);
+  let Image = "";
+  if (idImage && idImage !== "") {
+    const buffer = Buffer.from(idImage, "base64");
+    const tempFilePath = path.join(__dirname, "temp_image.jpg");
+    fs.writeFileSync(tempFilePath, buffer);
+    Image = await uploadOnCloudinary(tempFilePath);
+  }
+
+  let doc = "";
+  if (documentImage && documentImage !== "") {
+    const buffer1 = Buffer.from(documentImage, "base64");
+    const tempFilePath1 = path.join(__dirname, "temp_doc.jpg");
+    fs.writeFileSync(tempFilePath1, buffer1);
+    doc = await uploadOnCloudinary(tempFilePath1);
+  }
 
   const member = await Member.create({
-    clientId: req.client._id,
+    clientEmail: clientEmail,
     name,
     gender,
     dateOfBirth: DOB,
@@ -51,6 +105,7 @@ const createMember = asyncHandler(async (req, res, next) => {
     Address,
     idImage: Image && Image.url ? Image.url : "",
     documentImage: doc && doc.url ? doc.url : "",
+    flag: true,
   });
 
   if (!member) {
@@ -112,6 +167,10 @@ const deleteMemberById = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, "member not found"));
   }
 
+  if (!req.client || !req.client._id) {
+    return next(new ApiError(403, "Client information not available"));
+  }
+
   if (member.clientId.toString() !== req.client._id.toString()) {
     return next(new ApiError(403, "You are not allowed to delete this member"));
   }
@@ -128,6 +187,28 @@ const deleteMemberById = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, member, "Member deleted"));
 });
 
+const loginMember = asyncHandler(async (req, res, next) => {
+  const { clientEmail, contact } = req.body;
+
+  const client = await Client.findOne({ email: clientEmail });
+  if (!client) {
+    return next(new ApiError(404, "Client not found"));
+  }
+  const member = await Member.findOne({ contact });
+  if (!member) {
+    return next(new ApiError(404, "Member not found"));
+  }
+
+  const { accessToken, refreshToken } =
+    await generatorAccessAndRefreshTokenForClient(member._id);
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
+    .json(new ApiResponse(200, member, "you are login"));
+});
+
 export {
   createMember,
   getListOfMembers,
@@ -135,4 +216,5 @@ export {
   getListOfInactiveMembers,
   deleteMemberById,
   getListOfMembersbyClientId,
+  loginMember,
 };
