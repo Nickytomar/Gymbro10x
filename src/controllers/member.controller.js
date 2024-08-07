@@ -206,7 +206,7 @@ const loginMember = asyncHandler(async (req, res, next) => {
     .status(200)
     .cookie("accessToken", accessToken, cookieOptions)
     .cookie("refreshToken", refreshToken, cookieOptions)
-    .json(new ApiResponse(200, member, "you are login"));
+    .json(new ApiResponse(200, { id: member._id }, "you are login"));
 });
 
 export {
