@@ -11,10 +11,8 @@ import {
   loginMember,
 } from "../controllers/member.controller.js";
 
-import { getAllmembershipByMemberId } from "../controllers/membership.controller.js";
 const router = Router();
 router.route("/login").post(upload.none(), loginMember);
-router.route("/membership/:id").get(getAllmembershipByMemberId);
 
 router.use(verifyClient);
 router.route("/add").post(upload.none(), createMember);
