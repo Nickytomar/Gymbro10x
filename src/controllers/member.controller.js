@@ -97,6 +97,7 @@ const createMember = asyncHandler(async (req, res, next) => {
   }
 
   const member = await Member.create({
+    clientId: client._id,
     clientEmail: clientEmail,
     name,
     gender,
