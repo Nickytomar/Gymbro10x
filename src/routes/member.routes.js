@@ -18,7 +18,7 @@ router.use(verifyClient);
 router.route("/add").post(upload.none(), createMember);
 router.route("/").get(getListOfMembers);
 router.route("/inactive").get(getListOfInactiveMembers);
-router.route("/client").get(getListOfMembersbyClientId);
+router.route("/client").get(verifyClient, getListOfMembersbyClientId);
 router.route("/:id").get(getMemberById).delete(deleteMemberById);
 
 export default router;
