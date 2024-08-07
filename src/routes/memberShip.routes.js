@@ -12,11 +12,12 @@ import {
 } from "../controllers/membership.controller.js";
 
 const router = Router();
-router.use(verifyClient);
 
+router.route("/member/:id").get(getMemberdetailsbyId);
+
+router.use(verifyClient);
 router.route("/create").post(upload.none(), createMemberShip);
 router.route("/").get(getListOfMemberships);
-router.route("/member/:id").get(getMemberdetailsbyId);
 router.route("/inactive").get(getListOfInactiveMemberShip);
 router.route("/delete/:id").delete(deleteMemberShip);
 router.route("/update/:id").put(upload.none(), updateMemberShip);
