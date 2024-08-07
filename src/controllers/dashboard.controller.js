@@ -32,6 +32,7 @@ const dashboard = asyncHandler(async (req, res, next) => {
   let totalMontlyAmount = 0;
   let activeMembersCount = 0;
   let inactiveMembersCount = 0;
+  let noMembershipCount = 0;
 
   const newMembersDate = new Date(currentDate);
   newMembersDate.setDate(currentDate.getDate() - 30); // Example: new members in the last 30 days
@@ -42,7 +43,11 @@ const dashboard = asyncHandler(async (req, res, next) => {
     if (!member.overdue && !member.isMemberShipListEmpty) {
       activeMembersCount++;
     } else {
-      inactiveMembersCount++;
+      if (!member.isMemberShipListEmpty) {
+        inactiveMembersCount++;
+      } else {
+        noMembershipCount++;
+      }
     }
   });
 
@@ -74,7 +79,9 @@ const dashboard = asyncHandler(async (req, res, next) => {
     todayCollectionAmount: todayCollectionAmount,
     activeMembers: activeMembersCount,
     inactiveMembers: inactiveMembersCount,
+    noMembership: noMembershipCount,
   };
+  console.log(newdashboard);
 
   res.status(200).json(new ApiResponse(200, newdashboard, "dashboard info"));
 });
