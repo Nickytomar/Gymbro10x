@@ -10,6 +10,7 @@ import {
   deleteClient,
   sendOtptoMail,
   changePassword,
+  checkMemberPhoneExist,
 } from "../controllers/auth.controller.js";
 
 const router = Router();
@@ -22,5 +23,6 @@ router.route("/logout").post(verifyClient, logoutClient);
 router.route("/delete/:id").delete(deleteClient);
 router.route("/send-otp").post(sendOtptoMail);
 router.route("/change-password").post(changePassword);
+router.route("/check-member-phone").post(verifyClient, checkMemberPhoneExist);
 
 export default router;
