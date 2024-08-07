@@ -248,6 +248,21 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
+const checkMemberPhoneExist = asyncHandler(async (req, res, next) => {
+  const { contact } = req.body;
+  const member = await Member.findOne({
+    contact: contact,
+  });
+
+  if (!member) {
+    return res.status(200).json(new ApiResponse(200, {}, "Member not found"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { flag: member.flag }, "Member found"));
+});
+
 export {
   registerClient,
   loginClient,
@@ -256,4 +271,5 @@ export {
   deleteClient,
   sendOtptoMail,
   changePassword,
+  checkMemberPhoneExist,
 };
