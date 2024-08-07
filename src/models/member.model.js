@@ -3,11 +3,11 @@ import jwt from "jsonwebtoken";
 
 const memberSchema = new mongoose.Schema(
   {
-    // clientId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Client",
-    //   // required: true,
-    // },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
+      required: true,
+    },
     clientEmail: {
       type: String,
       required: true,
