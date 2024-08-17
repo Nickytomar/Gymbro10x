@@ -209,6 +209,40 @@ const loginMember = asyncHandler(async (req, res, next) => {
     .cookie("refreshToken", refreshToken, cookieOptions)
     .json(new ApiResponse(200, { id: member._id }, "you are login"));
 });
+const updateMember = asyncHandler(async (req, res, next) => {
+  const {
+    clientEmail,
+    name,
+    gender,
+    DOB,
+    contact,
+    Address,
+    idImage,
+    documentImage,
+  } = req.body;
+  const member = await Member.findById(req.params.id);
+  if (!member) {
+    return next(new ApiError(404, "Member not found"));
+  }
+  const updatedMember = await Member.findByIdAndUpdate(
+    req.params.id,
+    {
+      clientEmail,
+      name,
+      gender,
+      DOB,
+      contact,
+      Address,
+      idImage: member.idImage,
+      documentImage,
+    },
+    { new: true }
+  );
+  if (!updatedMember) {
+    return next(new ApiError(500, "Failed to update member"));
+  }
+  res.status(200).json(new ApiResponse(200, updatedMember, "Member updated"));
+});
 
 export {
   createMember,
@@ -218,4 +252,5 @@ export {
   deleteMemberById,
   getListOfMembersbyClientId,
   loginMember,
+  updateMember,
 };
