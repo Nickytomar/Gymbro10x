@@ -9,6 +9,7 @@ import {
   deleteMemberById,
   getListOfMembersbyClientId,
   loginMember,
+  updateMember,
 } from "../controllers/member.controller.js";
 
 const router = Router();
@@ -19,6 +20,10 @@ router.route("/add").post(upload.none(), createMember);
 router.route("/").get(getListOfMembers);
 router.route("/inactive").get(getListOfInactiveMembers);
 router.route("/client").get(verifyClient, getListOfMembersbyClientId);
-router.route("/:id").get(getMemberById).delete(deleteMemberById);
+router
+  .route("/:id")
+  .get(getMemberById)
+  .delete(deleteMemberById)
+  .put(upload.none(), updateMember);
 
 export default router;
