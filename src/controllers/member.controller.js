@@ -233,6 +233,14 @@ const updateMember = asyncHandler(async (req, res, next) => {
     Image = await uploadOnCloudinary(tempFilePath);
   }
 
+  let doc = "";
+  if (documentImage && documentImage !== "") {
+    const buffer1 = Buffer.from(documentImage, "base64");
+    const tempFilePath1 = path.join(__dirname, "temp_doc.jpg");
+    fs.writeFileSync(tempFilePath1, buffer1);
+    doc = await uploadOnCloudinary(tempFilePath1);
+  }
+
   const updatedMember = await Member.findByIdAndUpdate(
     req.params.id,
     {
@@ -243,7 +251,7 @@ const updateMember = asyncHandler(async (req, res, next) => {
       contact,
       Address,
       idImage: Image && Image.url ? Image.url : member.idImage,
-      documentImage,
+      documentImage: doc && doc.url ? doc.url : member.documentImage,
     },
     { new: true }
   );
