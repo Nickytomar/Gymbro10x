@@ -42,7 +42,6 @@ const memberShipSchema = new mongoose.Schema(
     },
     paymentMode: {
       type: String,
-
       required: true,
     },
     remark: String,
