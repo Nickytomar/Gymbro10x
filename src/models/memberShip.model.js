@@ -42,7 +42,7 @@ const memberShipSchema = new mongoose.Schema(
     },
     paymentMode: {
       type: String,
-      enum: ["cash", "card", "upi"],
+
       required: true,
     },
     remark: String,
