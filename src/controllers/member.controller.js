@@ -224,6 +224,23 @@ const updateMember = asyncHandler(async (req, res, next) => {
   if (!member) {
     return next(new ApiError(404, "Member not found"));
   }
+
+  let Image = "";
+  if (idImage && idImage !== "") {
+    const buffer = Buffer.from(idImage, "base64");
+    const tempFilePath = path.join(__dirname, "temp_image.jpg");
+    fs.writeFileSync(tempFilePath, buffer);
+    Image = await uploadOnCloudinary(tempFilePath);
+  }
+
+  let doc = "";
+  if (documentImage && documentImage !== "") {
+    const buffer1 = Buffer.from(documentImage, "base64");
+    const tempFilePath1 = path.join(__dirname, "temp_doc.jpg");
+    fs.writeFileSync(tempFilePath1, buffer1);
+    doc = await uploadOnCloudinary(tempFilePath1);
+  }
+
   const updatedMember = await Member.findByIdAndUpdate(
     req.params.id,
     {
@@ -233,8 +250,8 @@ const updateMember = asyncHandler(async (req, res, next) => {
       DOB,
       contact,
       Address,
-      idImage: member.idImage,
-      documentImage,
+      idImage: Image && Image.url ? Image.url : member.idImage,
+      documentImage: doc && doc.url ? doc.url : member.documentImage,
     },
     { new: true }
   );
