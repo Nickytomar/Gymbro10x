@@ -21,6 +21,7 @@ const clientSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// test commit
 clientSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
